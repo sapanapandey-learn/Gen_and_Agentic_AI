@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', sans-serif; background: #0f1117; color: #e8eaf0; }
+.app { max-width: 860px; margin: 0 auto; padding: 20px; }
+.header { text-align: center; margin-bottom: 20px; }
+.header h1 { font-size: 20px; color: #a78bfa; }
+.header p { font-size: 12px; color: #6b7280; margin-top: 4px; }
+
+.nav { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
+.nav-btn { padding: 7px 14px; border: none; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; background: #1e2130; color: #6b7280; transition: all 0.2s; }
+.nav-btn.active { background: #a78bfa; color: #fff; }
+.nav-btn:hover:not(.active) { background: #2a2d3e; color: #a78bfa; }
+
+.page { display: none; }
+.page.active { display: block; }
+
+.card { background: #1a1d2e; border-radius: 12px; padding: 20px; margin-bottom: 14px; border: 1px solid #2a2d3e; }
+.card-title { font-size: 17px; font-weight: 700; color: #a78bfa; margin-bottom: 4px; }
+.card-sub { font-size: 12px; color: #f59e0b; margin-bottom: 14px; font-style: italic; }
+
+.prose { font-size: 13px; color: #9ca3af; line-height: 1.8; }
+.prose .hl { color: #fbbf24; font-weight: 600; }
+.prose .grn { color: #86efac; font-weight: 600; }
+.prose .blu { color: #7dd3fc; font-weight: 600; }
+.prose .pur { color: #c4b5fd; font-weight: 600; }
+
+.formula { background: #1e1a3a; border: 1px solid #4c1d95; border-radius: 8px; padding: 12px 16px; text-align: center; font-size: 16px; font-weight: 700; color: #c4b5fd; margin: 12px 0; }
+.formula .small { font-size: 12px; color: #7c3aed; font-weight: 400; display: block; margin-top: 4px; }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.panel { background: #0f1117; border-radius: 8px; padding: 14px; border: 1px solid #2a2d3e; }
+.panel-title { font-size: 10px; font-weight: 700; text-transform: uppercase; color: #6b7280; letter-spacing: 1px; margin-bottom: 10px; }
+
+.why { background: #1a2a1a; border-left: 3px solid #22c55e; border-radius: 0 8px 8px 0; padding: 12px; font-size: 13px; color: #86efac; margin: 12px 0; }
+.why strong { color: #4ade80; }
+
+.note { background: #1a1f2e; border-left: 3px solid #3b82f6; border-radius: 0 8px 8px 0; padding: 12px; font-size: 13px; color: #93c5fd; margin: 12px 0; }
+
+.step-list { display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
+.step-item { display: flex; gap: 12px; align-items: flex-start; }
+.step-dot { width: 26px; height: 26px; border-radius: 50%; background: #a78bfa; color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+.step-text { font-size: 13px; color: #9ca3af; line-height: 1.6; }
+.step-text strong { color: #e8eaf0; }
+
+.slider-wrap { margin: 14px 0; }
+.slider-label { display: flex; justify-content: space-between; font-size: 12px; color: #6b7280; margin-bottom: 6px; }
+.slider-label span:last-child { color: #a78bfa; font-weight: 700; }
+input[type=range] { width: 100%; accent-color: #a78bfa; cursor: pointer; }
+
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0; }
+.comp-box { border-radius: 8px; padding: 12px; }
+.comp-bad { background: #2e1a1a; border: 1px solid #7f1d1d; }
+.comp-good { background: #1a2e1a; border: 1px solid #14532d; }
+.comp-title { font-size: 11px; font-weight: 700; margin-bottom: 6px; }
+.comp-bad .comp-title { color: #ef4444; }
+.comp-good .comp-title { color: #22c55e; }
+.comp-body { font-size: 12px; color: #9ca3af; line-height: 1.6; }
+
+.big-eq { font-size: 20px; font-weight: 700; text-align: center; padding: 16px; background: #0f1117; border-radius: 8px; margin: 12px 0; }
+
+.arrow-bridge { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 10px 0; }
+.ab-box { padding: 10px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; text-align: center; }
+.ab-arrow { color: #4b5563; font-size: 18px; flex-shrink: 0; }
+.ab-math { background: #1e1a3a; color: #c4b5fd; border: 1px solid #4c1d95; }
+.ab-nn { background: #1e3a5f; color: #7dd3fc; border: 1px solid #1e40af; }
+
+.highlight-row { display: flex; gap: 10px; margin: 12px 0; flex-wrap: wrap; }
+.hl-box { flex: 1; min-width: 120px; background: #0f1117; border-radius: 8px; padding: 12px; border-top: 2px solid; text-align: center; }
+.hl-m { border-color: #fbbf24; }
+.hl-x { border-color: #7dd3fc; }
+.hl-b { border-color: #86efac; }
+.hl-y { border-color: #c4b5fd; }
+.hl-box .hl-sym { font-size: 28px; font-weight: 900; margin-bottom: 6px; }
+.hl-m .hl-sym { color: #fbbf24; }
+.hl-x .hl-sym { color: #7dd3fc; }
+.hl-b .hl-sym { color: #86efac; }
+.hl-y .hl-sym { color: #c4b5fd; }
+.hl-box .hl-name { font-size: 12px; font-weight: 700; margin-bottom: 4px; }
+.hl-box .hl-desc { font-size: 11px; color: #6b7280; line-height: 1.5; }
+.hl-box .hl-nn { font-size: 11px; color: #a78bfa; margin-top: 6px; font-style: italic; }
+
+@media(max-width:580px) { .two-col, .compare { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <h1>🧮 The Math Behind Neural Networks</h1>
+    <p>From y = mx all the way to your neural network — every piece of math, explained from scratch</p>
+  </div>
+
+  <div class="nav">
+    <button class="nav-btn active" onclick="go(0)">① y = mx</button>
+    <button class="nav-btn" onclick="go(1)">② y = mx + b</button>
+    <button class="nav-btn" onclick="go(2)">③ Many inputs</button>
+    <button class="nav-btn" onclick="go(3)">④ Why matrices</button>
+    <button class="nav-btn" onclick="go(4)">⑤ The problem</button>
+    <button class="nav-btn" onclick="go(5)">⑥ Sigmoid</button>
+    <button class="nav-btn" onclick="go(6)">⑦ Loss</button>
+    <button class="nav-btn" onclick="go(7)">⑧ Gradient</button>
+    <button class="nav-btn" onclick="go(8)">⑨ Full picture</button>
+  </div>
+
+  <!-- PAGE 0: y = mx -->
+  <div class="page active" id="p0">
+    <div class="card">
+      <div class="card-title">① Where does y = mx come from?</div>
+      <div class="card-sub">The oldest idea in math: things are related to each other</div>
+      <div class="prose">
+        Imagine you're a shopkeeper. You sell mangoes. Each mango costs ₹5.<br><br>
+        If someone buys <span class="hl">3 mangoes</span>, total = <span class="grn">₹15</span>.<br>
+        If someone buys <span class="hl">7 mangoes</span>, total = <span class="grn">₹35</span>.<br><br>
+        You just wrote a rule: <span class="pur">total = 5 × quantity</span><br><br>
+        In math notation, that's: <span class="pur">y = 5x</span>. That's it. That's y = mx.
+      </div>
+      <div class="formula">y = m · x<div class="small">y = output &nbsp;|&nbsp; m = rate (slope) &nbsp;|&nbsp; x = input</div></div>
+      <div class="prose">
+        <span class="hl">m</span> is the "rate" — how much y changes when x changes by 1.<br>
+        m = 5 means "for every 1 unit of x, y goes up by 5."
+      </div>
+
+      <div style="margin: 16px 0;">
+        <div class="slider-label"><span>Move m (slope):</span><span id="m-val">m = 2</span></div>
+        <input type="range" min="-4" max="4" value="2" step="0.5" oninput="updateLine(this.value)">
+        <svg id="line-svg" viewBox="0 0 300 200" style="width:100%; border-radius:8px; background:#0f1117; margin-top:8px;">
+          <line x1="0" y1="100" x2="300" y2="100" stroke="#1e2130" stroke-width="1"/>
+          <line x1="150" y1="0" x2="150" y2="200" stroke="#1e2130" stroke-width="1"/>
+          <text x="280" y="96" fill="#4b5563" font-size="10">x</text>
+          <text x="154" y="12" fill="#4b5563" font-size="10">y</text>
+          <line id="the-line" x1="0" y1="180" x2="300" y2="20" stroke="#a78bfa" stroke-width="2.5"/>
+          <text id="line-label" x="220" y="40" fill="#a78bfa" font-size="11" font-weight="bold">y = 2x</text>
+        </svg>
+      </div>
+
+      <div class="why"><strong>Why does this matter for neural networks?</strong> A single neuron IS this formula. It multiplies input by a weight (m) to get an output. The entire network is just many of these happening at once.</div>
+    </div>
+  </div>
+
+  <!-- PAGE 1: y = mx + b -->
+  <div class="page" id="p1">
+    <div class="card">
+      <div class="card-title">② Adding bias: y = mx + b</div>
+      <div class="card-sub">What if things don't start at zero?</div>
+      <div class="prose">
+        Back to mangoes. But now there's a ₹10 delivery charge regardless of how many you buy.<br><br>
+        <span class="hl">0 mangoes</span> → still pay ₹10 (delivery).<br>
+        <span class="hl">3 mangoes</span> → 5×3 + 10 = <span class="grn">₹25</span>.<br>
+        <span class="hl">7 mangoes</span> → 5×7 + 10 = <span class="grn">₹45</span>.<br><br>
+        Rule: <span class="pur">total = 5 × quantity + 10</span> → <span class="pur">y = mx + b</span>
+      </div>
+      <div class="formula">y = m · x + b<div class="small">b = bias (the fixed starting value when x = 0)</div></div>
+      <div class="highlight-row">
+        <div class="hl-box hl-m"><div class="hl-sym">m</div><div class="hl-name">Slope / Weight</div><div class="hl-desc">How much y changes per unit of x</div><div class="hl-nn">→ W in your code</div></div>
+        <div class="hl-box hl-x"><div class="hl-sym">x</div><div class="hl-name">Input</div><div class="hl-desc">What goes in (student's scores)</div><div class="hl-nn">→ X in your code</div></div>
+        <div class="hl-box hl-b"><div class="hl-sym">b</div><div class="hl-name">Bias</div><div class="hl-desc">Fixed offset — output when input = 0</div><div class="hl-nn">→ b in your code</div></div>
+        <div class="hl-box hl-y"><div class="hl-sym">y</div><div class="hl-name">Output</div><div class="hl-desc">The prediction</div><div class="hl-nn">→ z in your code</div></div>
+      </div>
+      <div class="compare">
+        <div class="comp-box comp-bad">
+          <div class="comp-title">❌ Without bias (y = mx)</div>
+          <div class="comp-body">Line MUST pass through origin (0,0). Even if all scores are 0, prediction is forced to be 0. Very limiting — data rarely starts at zero.</div>
+        </div>
+        <div class="comp-box comp-good">
+          <div class="comp-title">✅ With bias (y = mx + b)</div>
+          <div class="comp-body">Line can sit anywhere. Even when all inputs are 0, the neuron can still output a non-zero value. More flexible, fits more patterns.</div>
+        </div>
+      </div>
+      <div class="why"><strong>The neuron in your code:</strong> <code style="background:#0a0c14; padding:2px 6px; border-radius:4px; font-size:12px; color:#7dd3fc;">z = X @ W + b</code> is literally y = mx + b. W is m (slope/weight), b is b (bias). Your network learns both.</div>
+    </div>
+  </div>
+
+  <!-- PAGE 2: Many inputs -->
+  <div class="page" id="p2">
+    <div class="card">
+      <div class="card-title">③ What if you have many inputs?</div>
+      <div class="card-sub">Extending y = mx + b from 1 feature to 3 features</div>
+      <div class="prose">
+        y = mx + b works for <span class="hl">one input</span>. But your students each have <span class="hl">3 scores</span>.<br><br>
+        Now you need one weight (m) for each input:
+      </div>
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-dot">1</div>
+          <div class="step-text"><strong>One score:</strong> y = w₁·score₁ + b</div>
+        </div>
+        <div class="step-item">
+          <div class="step-dot">2</div>
+          <div class="step-text"><strong>Two scores:</strong> y = w₁·score₁ + w₂·score₂ + b</div>
+        </div>
+        <div class="step-item">
+          <div class="step-dot">3</div>
+          <div class="step-text"><strong>Three scores (your code):</strong> y = w₁·score₁ + w₂·score₂ + w₃·score₃ + b</div>
+        </div>
+      </div>
+      <div class="formula">z = w₁x₁ + w₂x₂ + w₃x₃ + b<div class="small">This is called a "weighted sum" or "dot product + bias"</div></div>
+      <div class="prose">
+        Each weight <span class="hl">wᵢ</span> says: <em>"how much does feature i matter for the prediction?"</em><br><br>
+        <span class="grn">High w₂</span> = score₂ matters a lot.<br>
+        <span class="grn">Near-zero w₁</span> = score₁ is almost irrelevant.<br><br>
+        The network <span class="hl">learns</span> these weights automatically. You start them small and random, and gradient descent finds the right values.
+      </div>
+      <div class="note">This is called a <strong>linear combination</strong> — adding up things multiplied by constants. It's the core operation in ALL of linear algebra and ALL of neural networks.</div>
+    </div>
+  </div>
+
+  <!-- PAGE 3: Why matrices -->
+  <div class="page" id="p3">
+    <div class="card">
+      <div class="card-title">④ Why do we use matrices?</div>
+      <div class="card-sub">Pure efficiency — doing it for all students at once</div>
+      <div class="prose">
+        You have 5 students. You could write one equation per student:
+      </div>
+      <div style="background:#0f1117; border-radius:8px; padding:12px; margin:12px 0; font-family:monospace; font-size:12px; color:#6b7280; line-height:2;">
+        z₁ = w₁·x₁₁ + w₂·x₁₂ + w₃·x₁₃ + b &nbsp;<span style="color:#ef4444;">← student 1</span><br>
+        z₂ = w₁·x₂₁ + w₂·x₂₂ + w₃·x₂₃ + b &nbsp;<span style="color:#ef4444;">← student 2</span><br>
+        z₃ = w₁·x₃₁ + w₂·x₃₂ + w₃·x₃₃ + b &nbsp;<span style="color:#ef4444;">← student 3</span><br>
+        z₄ = w₁·x₄₁ + w₂·x₄₂ + w₃·x₄₃ + b &nbsp;<span style="color:#ef4444;">← student 4</span><br>
+        z₅ = w₁·x₅₁ + w₂·x₅₂ + w₃·x₅₃ + b &nbsp;<span style="color:#ef4444;">← student 5</span>
+      </div>
+      <div class="prose">That's 5 separate equations. Now imagine 1 million students. Writing loops is slow.<br><br>Matrices let you do <span class="hl">all 5 at once</span> in one operation:</div>
+      <div class="formula">Z = X · W + b<div class="small">(5×3) · (3×1) + (1,) = (5×1) — all 5 students, one operation</div></div>
+      <div class="prose" style="margin-bottom:12px;">How matrix multiply works for one student (row × column):</div>
+      <div style="background:#0f1117; border-radius:8px; padding:14px; font-family:monospace; font-size:13px; text-align:center; color:#9ca3af; line-height:2.2;">
+        [<span style="color:#7dd3fc;">x₁ x₂ x₃</span>] &nbsp;·&nbsp; <span style="color:#c4b5fd;">[w₁]</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#c4b5fd;">[w₂]</span> &nbsp;= &nbsp;<span style="color:#86efac;">x₁·w₁ + x₂·w₂ + x₃·w₃</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#c4b5fd;">[w₃]</span>
+      </div>
+      <div class="prose" style="margin-top:12px;">The inner dimensions must match: (5×<span class="hl">3</span>) · (<span class="hl">3</span>×1). The 3s cancel. Result: (5×1).</div>
+      <div class="why"><strong>Think of it as:</strong> each row of X is one student's data. Each row gets multiplied by W and produces one output number. All rows processed simultaneously. This is why GPUs are fast — they're built for exactly this.</div>
+    </div>
+  </div>
+
+  <!-- PAGE 4: The problem with linear -->
+  <div class="page" id="p4">
+    <div class="card">
+      <div class="card-title">⑤ The problem with pure math (why activation functions exist)</div>
+      <div class="card-sub">y = mx + b can only draw straight lines — but real data isn't straight</div>
+      <div class="prose">
+        y = mx + b is a <span class="hl">linear</span> equation. No matter how many you stack, it's still linear.<br><br>
+        Real problems are non-linear:
+      </div>
+      <div class="step-list" style="margin: 12px 0;">
+        <div class="step-item">
+          <div class="step-dot" style="background:#ef4444;">✗</div>
+          <div class="step-text">Can a straight line separate cats from dogs in an image? <strong style="color:#ef4444;">No.</strong></div>
+        </div>
+        <div class="step-item">
+          <div class="step-dot" style="background:#ef4444;">✗</div>
+          <div class="step-text">Can y=mx+b output a probability (0 to 1)? <strong style="color:#ef4444;">No — it goes to ±infinity.</strong></div>
+        </div>
+        <div class="step-item">
+          <div class="step-dot" style="background:#ef4444;">✗</div>
+          <div class="step-text">Two linear layers stacked = still one linear layer. <strong style="color:#ef4444;">Depth becomes useless.</strong></div>
+        </div>
+      </div>
+      <div class="prose">
+        Solution: after the linear step, apply a <span class="hl">non-linear function</span>. This is called an <span class="pur">activation function</span>.
+      </div>
+      <div class="arrow-bridge" style="justify-content:center; margin:16px 0;">
+        <div class="ab-box ab-math">Linear step<br><span style="font-size:10px; font-weight:400;">z = Xw + b</span></div>
+        <div class="ab-arrow">→</div>
+        <div class="ab-box ab-nn">Activation<br><span style="font-size:10px; font-weight:400;">σ(z) or ReLU(z)</span></div>
+        <div class="ab-arrow">→</div>
+        <div class="ab-box ab-math">Output<br><span style="font-size:10px; font-weight:400;">probability / class</span></div>
+      </div>
+      <div class="compare">
+        <div class="comp-box comp-bad">
+          <div class="comp-title">Without activation</div>
+          <div class="comp-body">z = Xw + b → raw number (-∞ to +∞). Can't be a probability. Stack 100 layers — still just a line. Network can only learn linear patterns.</div>
+        </div>
+        <div class="comp-box comp-good">
+          <div class="comp-title">With activation</div>
+          <div class="comp-body">σ(Xw + b) → 0 to 1. Stack 2 layers → can learn curves. Stack 10 layers → can learn almost ANY pattern. This is why deep learning works.</div>
+        </div>
+      </div>
+      <div class="why"><strong>The key insight:</strong> Linear + non-linear, repeated many times = a <strong>universal function approximator</strong>. Given enough neurons, a neural network can learn ANY pattern. The activation function is what makes this possible.</div>
+    </div>
+  </div>
+
+  <!-- PAGE 5: Sigmoid -->
+  <div class="page" id="p5">
+    <div class="card">
+      <div class="card-title">⑥ Sigmoid — where does the formula come from?</div>
+      <div class="card-sub">You need a function that squashes any number to (0,1). Sigmoid is the mathematical answer.</div>
+      <div class="prose">
+        You want a function f(x) such that:<br>
+        • f(-∞) = 0<br>
+        • f(0) = 0.5<br>
+        • f(+∞) = 1<br>
+        • Smooth curve everywhere (differentiable — needed for gradients)<br><br>
+        The natural mathematical function that does this is:
+      </div>
+      <div class="formula">σ(z) = 1 / (1 + e⁻ᶻ)<div class="small">e = Euler's number ≈ 2.718 (the base of natural logarithm)</div></div>
+      <div class="prose"><strong style="color:#fbbf24;">Where does e come from?</strong><br><br>
+        e is a special number (≈2.718) that appears naturally in growth, decay, and probability. <br>
+        e⁻ᶻ means "e to the power of negative z".<br><br>
+        When z = 0: &nbsp; e⁰ = 1, so σ(0) = 1/(1+1) = <span class="grn">0.5</span><br>
+        When z = +big: e⁻ᶻ → 0, so σ = 1/(1+0) = <span class="grn">1</span><br>
+        When z = -big: e⁻ᶻ → ∞, so σ = 1/(1+∞) = <span class="grn">0</span>
+      </div>
+      <div class="note" style="margin-top:12px;"><strong>You don't invent this formula.</strong> Mathematicians derived it from probability theory (logistic regression was invented in 1958). You use it because it's the proven answer to "how do I get a smooth 0-to-1 output?" For deep hidden layers today, ReLU is preferred because sigmoid has the vanishing gradient problem — but for the output layer in binary classification, sigmoid is still correct.</div>
+    </div>
+  </div>
+
+  <!-- PAGE 6: Loss -->
+  <div class="page" id="p6">
+    <div class="card">
+      <div class="card-title">⑦ Loss Function — where does it come from?</div>
+      <div class="card-sub">Not invented arbitrarily — derived from information theory and probability</div>
+      <div class="prose">
+        After sigmoid you have a prediction ŷ (say 0.8 = "80% chance of passing").<br>
+        True label y = 1 (they did pass).<br><br>
+        You need ONE number that answers: <span class="hl">"how wrong am I?"</span><br><br>
+        <strong style="color:#fbbf24;">Why not just use (ŷ − y)²?</strong> (Mean Squared Error)<br>
+        You could. But when predictions are near 0 or 1, MSE has very small gradients → slow learning. Cross-entropy has better gradient properties.
+      </div>
+      <div class="formula">L = −[y·log(ŷ) + (1−y)·log(1−ŷ)]<div class="small">Binary Cross-Entropy — from Maximum Likelihood Estimation in statistics</div></div>
+      <div class="prose"><strong style="color:#fbbf24;">Where does log come from?</strong><br><br>
+        log is the inverse of e. If e² = 7.38, then log(7.38) = 2.<br>
+        Key property: log(1) = 0, log(small number) = very negative.<br><br>
+        So −log(ŷ) when ŷ=0.99 → −log(0.99) ≈ <span class="grn">0.01</span> (correct, small loss)<br>
+        So −log(ŷ) when ŷ=0.01 → −log(0.01) ≈ <span style="color:#ef4444;">4.6</span> (very wrong, big loss)<br><br>
+        This is what you want — punish confident wrong answers heavily.
+      </div>
+      <div class="step-list" style="margin-top:12px;">
+        <div class="step-item">
+          <div class="step-dot">y=1</div>
+          <div class="step-text">Formula becomes: <strong>−log(ŷ)</strong>. Loss is 0 when ŷ=1 (perfect), explodes when ŷ→0.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-dot">y=0</div>
+          <div class="step-text">Formula becomes: <strong>−log(1−ŷ)</strong>. Loss is 0 when ŷ=0 (perfect), explodes when ŷ→1.</div>
+        </div>
+      </div>
+      <div class="why"><strong>Origin:</strong> This comes from Maximum Likelihood Estimation — a statistics concept from 1920s. You're asking "what weights make the observed data most probable?" Maximising likelihood = minimising cross-entropy loss. Same thing, different language.</div>
+    </div>
+  </div>
+
+  <!-- PAGE 7: Gradient -->
+  <div class="page" id="p7">
+    <div class="card">
+      <div class="card-title">⑧ Gradient — what is it actually?</div>
+      <div class="card-sub">From calculus: the derivative tells you the slope at a point</div>
+      <div class="prose">
+        You learned y = mx in school. The <span class="hl">derivative</span> of y with respect to x is <span class="hl">m</span> — the slope.<br><br>
+        For a curved function like loss L, the derivative at any point tells you:<br>
+        <span class="pur">"If I increase W by a tiny amount, does L go up or down, and by how much?"</span><br><br>
+        This is written as <span class="hl">∂L/∂W</span> (partial derivative of L with respect to W).
+      </div>
+      <div class="formula">dW = ∂L/∂W = (1/n) · Xᵀ · (ŷ − y)<div class="small">Derived by applying chain rule through: loss → sigmoid → linear layer</div></div>
+      <div class="prose"><strong style="color:#fbbf24;">Chain rule (you don't need to derive it, just understand it):</strong><br><br>
+        Loss depends on ŷ. ŷ depends on z. z depends on W.<br>
+        To find how loss changes with W, you multiply the rates through:<br>
+        <span class="pur">∂L/∂W = (∂L/∂ŷ) × (∂ŷ/∂z) × (∂z/∂W)</span><br><br>
+        When you work this out mathematically for BCE + sigmoid + linear, it beautifully simplifies to just: <span class="grn">(ŷ − y)</span> × X.<br><br>
+        This is why the gradient formula looks simple — the math cancels out cleanly.
+      </div>
+      <div class="compare">
+        <div class="comp-box comp-bad">
+          <div class="comp-title">Positive gradient (dW > 0)</div>
+          <div class="comp-body">Loss increases when W increases. So decrease W. Move opposite direction: W = W − α·dW</div>
+        </div>
+        <div class="comp-box comp-good">
+          <div class="comp-title">Negative gradient (dW < 0)</div>
+          <div class="comp-body">Loss decreases when W increases. So increase W. Moving opposite still works: W = W − α·(negative) = W + something</div>
+        </div>
+      </div>
+      <div class="why"><strong>Always subtract the gradient.</strong> Gradient points toward steepest increase in loss. You want to decrease loss. So move opposite = subtract. This is gradient descent.</div>
+    </div>
+  </div>
+
+  <!-- PAGE 8: Full picture -->
+  <div class="page" id="p8">
+    <div class="card">
+      <div class="card-title">⑨ The Full Picture — how it all connects</div>
+      <div class="card-sub">Every piece of math you just learned, in one chain</div>
+
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-dot">1</div>
+          <div class="step-text"><strong style="color:#7dd3fc;">y = mx + b → z = XW + b</strong><br>Weighted sum. Each weight says "how important is this feature?" Bias allows offset. Pure linear algebra.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-dot">2</div>
+          <div class="step-text"><strong style="color:#fcd34d;">Activation → ŷ = σ(z) = 1/(1+e⁻ᶻ)</strong><br>Squash to 0–1. Makes output a probability. Non-linearity allows network to learn curves, not just lines.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-dot">3</div>
+          <div class="step-text"><strong style="color:#fca5a5;">Loss → L = −[y·log(ŷ) + (1−y)·log(1−ŷ)]</strong><br>Measures wrongness. From statistics (MLE). log punishes confident wrong predictions heavily.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-dot">4</div>
+          <div class="step-text"><strong style="color:#93c5fd;">Gradient → dW = (1/n)·Xᵀ·(ŷ−y)</strong><br>Derivative of loss w.r.t. weights. Chain rule through all layers. Tells you which direction to move.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-dot">5</div>
+          <div class="step-text"><strong style="color:#a5b4fc;">Update → W = W − α·dW</strong><br>Move weights opposite to gradient. α (learning rate) controls step size. Repeat 1000+ times = training.</div>
+        </div>
+      </div>
+
+      <div class="big-eq">
+        <span style="color:#7dd3fc;">z=XW+b</span> → <span style="color:#fcd34d;">σ(z)</span> → <span style="color:#fca5a5;">L</span> → <span style="color:#93c5fd;">dW</span> → <span style="color:#a5b4fc;">W_new</span> → 🔁
+      </div>
+
+      <div class="note">
+        <strong>The math fields behind this:</strong><br>
+        • <strong>Linear Algebra</strong> → z = XW + b (matrix operations)<br>
+        • <strong>Calculus</strong> → derivatives, chain rule, gradient<br>
+        • <strong>Statistics / Probability</strong> → sigmoid, cross-entropy loss, MLE<br>
+        • <strong>Optimisation</strong> → gradient descent, learning rate<br><br>
+        You don't need to master all four first. Learn them <em>alongside</em> the neural network — the network gives you the "why" for each concept.
+      </div>
+      <div class="why"><strong>The big answer to your question:</strong> These aren't arbitrary decisions. Every formula was derived from math. Sigmoid → from probability theory. Cross-entropy → from statistics. Gradient → from calculus. You're not supposed to invent these — you learn <em>which formula fits which problem</em> and <em>why it was derived</em>.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function go(n) {
+  document.querySelectorAll('.page').forEach((p,i) => p.classList.toggle('active', i===n));
+  document.querySelectorAll('.nav-btn').forEach((b,i) => b.classList.toggle('active', i===n));
+}
+
+function updateLine(m) {
+  m = parseFloat(m);
+  document.getElementById('m-val').textContent = 'm = ' + m;
+  const svg = document.getElementById('the-line');
+  // center is (150,100), scale: 1 unit = 30px
+  // y = m*x, x from -5 to +5
+  const x1 = 0, x2 = 300;
+  const cx = 150, cy = 100, scale = 25;
+  const y1 = cy - m * (x1 - cx) / scale * scale;
+  const y2 = cy - m * (x2 - cx) / scale * scale;
+  svg.setAttribute('x1', x1); svg.setAttribute('y1', Math.max(-10, Math.min(210, y1)));
+  svg.setAttribute('x2', x2); svg.setAttribute('y2', Math.max(-10, Math.min(210, y2)));
+  document.getElementById('line-label').textContent = 'y = ' + m + 'x';
+}
+</script>
+</body>
+</html>
