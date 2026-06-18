@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', sans-serif; background: #0f1117; color: #e8eaf0; }
+.app { max-width: 900px; margin: 0 auto; padding: 20px; }
+.nav { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
+.nav-btn { padding: 7px 13px; border: none; border-radius: 20px; cursor: pointer; font-size: 11px; font-weight: 600; background: #1e2130; color: #6b7280; transition: all 0.2s; }
+.nav-btn.active { background: #a78bfa; color: #fff; }
+.nav-btn:hover:not(.active) { background: #2a2d3e; color: #a78bfa; }
+.page { display: none; }
+.page.active { display: block; }
+.card { background: #1a1d2e; border-radius: 12px; padding: 20px; margin-bottom: 12px; border: 1px solid #2a2d3e; }
+.title { font-size: 17px; font-weight: 700; color: #a78bfa; margin-bottom: 3px; }
+.sub { font-size: 12px; color: #f59e0b; margin-bottom: 14px; }
+.prose { font-size: 13px; color: #9ca3af; line-height: 1.8; }
+.hl { color: #fbbf24; font-weight: 700; }
+.grn { color: #86efac; font-weight: 700; }
+.red { color: #fca5a5; font-weight: 700; }
+.pur { color: #c4b5fd; font-weight: 700; }
+.blu { color: #7dd3fc; font-weight: 700; }
+.panel { background: #0f1117; border-radius: 10px; padding: 14px; border: 1px solid #2a2d3e; margin: 10px 0; }
+.ptitle { font-size: 10px; font-weight: 700; text-transform: uppercase; color: #6b7280; letter-spacing: 1px; margin-bottom: 10px; }
+.why { background: #1a2a1a; border-left: 3px solid #22c55e; border-radius: 0 8px 8px 0; padding: 12px; font-size: 13px; color: #86efac; margin: 10px 0; line-height: 1.7; }
+.why strong { color: #4ade80; display: block; margin-bottom: 3px; }
+.bad { background: #2a1a1a; border-left: 3px solid #ef4444; border-radius: 0 8px 8px 0; padding: 12px; font-size: 13px; color: #fca5a5; margin: 10px 0; line-height: 1.7; }
+.bad strong { color: #f87171; display: block; margin-bottom: 3px; }
+.info { background: #1a1f2e; border-left: 3px solid #3b82f6; border-radius: 0 8px 8px 0; padding: 12px; font-size: 13px; color: #93c5fd; margin: 10px 0; line-height: 1.7; }
+.col2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.col3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+canvas { border-radius: 8px; display: block; width: 100%; }
+.code { background: #0a0c14; border-radius: 6px; padding: 10px 14px; font-family: 'Courier New', monospace; font-size: 12px; color: #7dd3fc; margin: 8px 0; border-left: 3px solid #a78bfa; line-height: 1.9; }
+.cmt { color: #374151; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th { background: #0f1117; padding: 8px 10px; text-align: left; color: #6b7280; font-size: 10px; text-transform: uppercase; }
+td { padding: 8px 10px; border-bottom: 1px solid #1e2130; }
+tr:last-child td { border-bottom: none; }
+.insight-box { background: #0f1117; border-radius: 8px; padding: 12px; margin: 6px 0; border-left: 3px solid; }
+.i-grn { border-color: #22c55e; }
+.i-red { border-color: #ef4444; }
+.i-yel { border-color: #fbbf24; }
+.i-pur { border-color: #a78bfa; }
+.i-title { font-size: 11px; font-weight: 700; margin-bottom: 4px; }
+.i-grn .i-title { color: #4ade80; }
+.i-red .i-title { color: #f87171; }
+.i-yel .i-title { color: #fbbf24; }
+.i-pur .i-title { color: #c4b5fd; }
+.i-body { font-size: 12px; color: #9ca3af; line-height: 1.6; }
+@media(max-width:560px){ .col2,.col3{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="app">
+<div class="nav">
+  <button class="nav-btn active" onclick="go(0)">📈 Line</button>
+  <button class="nav-btn" onclick="go(1)">📊 Bar</button>
+  <button class="nav-btn" onclick="go(2)">🔵 Scatter</button>
+  <button class="nav-btn" onclick="go(3)">📉 Histogram</button>
+  <button class="nav-btn" onclick="go(4)">📦 Box plot</button>
+  <button class="nav-btn" onclick="go(5)">🌡️ Heatmap</button>
+  <button class="nav-btn" onclick="go(6)">⚙️ Matplotlib tips</button>
+</div>
+
+<!-- ══════════════════════════════════════ LINE ══ -->
+<div class="page active" id="p0">
+<div class="card">
+  <div class="title">📈 Line Plot — plt.plot()</div>
+  <div class="sub">Things that change over time or sequence</div>
+  <div class="col2">
+    <div class="panel">
+      <div class="ptitle">Healthy training curve</div>
+      <canvas id="c0a" height="160"></canvas>
+    </div>
+    <div class="panel">
+      <div class="ptitle">Overfitting curve</div>
+      <canvas id="c0b" height="160"></canvas>
+    </div>
+  </div>
+  <div class="code">
+plt.plot(train_losses, label='Train', color='blue')<br>
+plt.plot(val_losses,   label='Val',   color='red')<br>
+plt.xlabel('Epoch') <span class="cmt"># x axis label</span><br>
+plt.ylabel('Loss')  <span class="cmt"># y axis label</span><br>
+plt.legend()        <span class="cmt"># show colour legend</span>
+  </div>
+  <div class="ptitle" style="margin-top:14px;">HOW TO READ IT — PATTERNS</div>
+  <div class="insight-box i-grn"><div class="i-title">✅ Both lines going down</div><div class="i-body">Model is learning. Normal behaviour. Keep training.</div></div>
+  <div class="insight-box i-grn"><div class="i-title">✅ Small gap between train and val</div><div class="i-body">Model generalises well. Not memorising training data.</div></div>
+  <div class="insight-box i-red"><div class="i-title">❌ Val loss goes UP while train keeps going DOWN</div><div class="i-body">Overfitting. Model memorising training data. Add Dropout, get more data, stop training earlier.</div></div>
+  <div class="insight-box i-red"><div class="i-title">❌ Both lines flat from start</div><div class="i-body">Model not learning at all. Learning rate too low, wrong architecture, bug in code.</div></div>
+  <div class="insight-box i-yel"><div class="i-title">⚠️ Loss bouncing up and down</div><div class="i-body">Learning rate too high. Reduce it. Model is overshooting the minimum.</div></div>
+  <div class="why" style="margin-top:12px;"><strong>Where used in ML</strong>Training/validation loss curves. Accuracy over epochs. Learning rate vs loss. Any metric tracked during training.</div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════ BAR ══ -->
+<div class="page" id="p1">
+<div class="card">
+  <div class="title">📊 Bar Chart — plt.bar()</div>
+  <div class="sub">Comparing values across categories</div>
+  <div class="col2">
+    <div class="panel">
+      <div class="ptitle">Feature importance</div>
+      <canvas id="c1a" height="160"></canvas>
+    </div>
+    <div class="panel">
+      <div class="ptitle">Class distribution (imbalance check)</div>
+      <canvas id="c1b" height="160"></canvas>
+    </div>
+  </div>
+  <div class="code">
+plt.bar(categories, values, color='steelblue')<br>
+plt.barh(categories, values) <span class="cmt"># horizontal bars</span><br>
+plt.xticks(rotation=45)      <span class="cmt"># tilt x labels if crowded</span>
+  </div>
+  <div class="ptitle" style="margin-top:14px;">HOW TO READ IT — PATTERNS</div>
+  <div class="insight-box i-grn"><div class="i-title">✅ Feature importance bar chart</div><div class="i-body">Tall bars = important features. Short bars = can be dropped. Helps with feature selection — remove near-zero bars to simplify model.</div></div>
+  <div class="insight-box i-red"><div class="i-title">❌ Class imbalance — one bar much taller</div><div class="i-body">If "Class 0" bar is 850 and "Class 1" bar is 150 — your model will be biased. Need to oversample minority class or use class weights.</div></div>
+  <div class="insight-box i-yel"><div class="i-title">⚠️ Model comparison bar chart</div><div class="i-body">Compare accuracy of different models side by side. The tallest bar = best model. But also check if differences are statistically significant.</div></div>
+  <div class="why" style="margin-top:12px;"><strong>Where used in ML</strong>Feature importance (Random Forest, XGBoost). Class distribution before training. Comparing model accuracies. Category counts from value_counts().</div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════ SCATTER ══ -->
+<div class="page" id="p2">
+<div class="card">
+  <div class="title">🔵 Scatter Plot — plt.scatter()</div>
+  <div class="sub">Relationship between two numeric variables</div>
+  <div class="col2">
+    <div class="panel">
+      <div class="ptitle">Strong positive correlation</div>
+      <canvas id="c2a" height="160"></canvas>
+    </div>
+    <div class="panel">
+      <div class="ptitle">Two separable classes</div>
+      <canvas id="c2b" height="160"></canvas>
+    </div>
+  </div>
+  <div class="code">
+plt.scatter(x, y, color='blue', alpha=0.5)<br>
+<span class="cmt"># alpha = transparency (useful for overlapping dots)</span><br>
+plt.scatter(x, y, c=labels, cmap='RdYlGn') <span class="cmt"># colour by class</span>
+  </div>
+  <div class="ptitle" style="margin-top:14px;">HOW TO READ IT — PATTERNS</div>
+  <div class="insight-box i-grn"><div class="i-title">✅ Dots forming a diagonal line (up-right)</div><div class="i-body">Strong positive correlation. As X increases, Y increases. These two features move together — consider dropping one to avoid redundancy.</div></div>
+  <div class="insight-box i-grn"><div class="i-title">✅ Two clear clusters of different colours</div><div class="i-body">Classes are linearly separable. A simple model (logistic regression) might work. No need for deep network.</div></div>
+  <div class="insight-box i-red"><div class="i-title">❌ Colours completely mixed together</div><div class="i-body">Classes overlap heavily. These two features alone can't separate them. Need more features, or a non-linear model.</div></div>
+  <div class="insight-box i-yel"><div class="i-title">⚠️ One dot far from all others</div><div class="i-body">Outlier. Could be data entry error. Could skew your model heavily. Investigate before training.</div></div>
+  <div class="why" style="margin-top:12px;"><strong>Where used in ML</strong>Checking feature correlations before training. Visualising clusters (K-Means results). Actual vs predicted values in regression. PCA/t-SNE dimensionality reduction output.</div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════ HISTOGRAM ══ -->
+<div class="page" id="p3">
+<div class="card">
+  <div class="title">📉 Histogram — plt.hist()</div>
+  <div class="sub">Distribution of one variable — how values are spread</div>
+  <div class="col2">
+    <div class="panel">
+      <div class="ptitle">Normal distribution</div>
+      <canvas id="c3a" height="160"></canvas>
+    </div>
+    <div class="panel">
+      <div class="ptitle">Skewed distribution</div>
+      <canvas id="c3b" height="160"></canvas>
+    </div>
+  </div>
+  <div class="code">
+plt.hist(df['age'], bins=20, color='steelblue', edgecolor='black')<br>
+<span class="cmt"># bins = how many buckets to divide data into</span><br>
+<span class="cmt"># edgecolor = outline on each bar so they're visible</span>
+  </div>
+  <div class="ptitle" style="margin-top:14px;">HOW TO READ IT — PATTERNS</div>
+  <div class="insight-box i-grn"><div class="i-title">✅ Bell curve shape (normal distribution)</div><div class="i-body">Values clustered around the middle. Most ML algorithms work best with this. If you see this — good, no preprocessing needed.</div></div>
+  <div class="insight-box i-red"><div class="i-title">❌ Long tail to the right (right skew)</div><div class="i-body">Salary, house prices often look like this. A few very high values pull the mean up. Apply log transformation before training: np.log(df['salary'])</div></div>
+  <div class="insight-box i-red"><div class="i-title">❌ Two separate humps (bimodal)</div><div class="i-body">Two different groups mixed in one column. Male/female heights in one histogram. Consider splitting into separate features or groups.</div></div>
+  <div class="insight-box i-yel"><div class="i-title">⚠️ All values crammed in one bucket</div><div class="i-body">Feature has almost no variance. Useless for a model — drop it. Or increase bins to see finer detail.</div></div>
+  <div class="why" style="margin-top:12px;"><strong>Where used in ML</strong>Checking feature distributions before training. Spotting skewed features that need log transform. Finding outliers. Checking if normalisation/standardisation is needed.</div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════ BOX ══ -->
+<div class="page" id="p4">
+<div class="card">
+  <div class="title">📦 Box Plot — plt.boxplot()</div>
+  <div class="sub">Shows spread, median, and outliers of a variable</div>
+  <div class="panel">
+    <div class="ptitle">Anatomy of a box plot</div>
+    <canvas id="c4a" height="200"></canvas>
+  </div>
+  <div class="code">
+plt.boxplot(df['salary'])<br>
+plt.boxplot([group1, group2, group3]) <span class="cmt"># compare multiple groups</span>
+  </div>
+  <div class="ptitle" style="margin-top:14px;">HOW TO READ IT — PATTERNS</div>
+  <div class="insight-box i-pur"><div class="i-title">📦 The box itself</div><div class="i-body">Middle 50% of your data. The "IQR" (interquartile range). Bottom of box = 25th percentile. Top = 75th percentile. Wider box = more spread in the middle.</div></div>
+  <div class="insight-box i-pur"><div class="i-title">━ Line inside the box</div><div class="i-body">The median (middle value). If it's near the centre of the box → balanced. If it's near the top or bottom → skewed data.</div></div>
+  <div class="insight-box i-pur"><div class="i-title">│ Whiskers (lines above/below box)</div><div class="i-body">Extend to 1.5× the box size. Shows the expected range of values.</div></div>
+  <div class="insight-box i-red"><div class="i-title">❌ Dots beyond the whiskers</div><div class="i-body">Outliers. Values far outside normal range. Each dot is one data point that's unusually extreme. Investigate — could be data errors or genuinely rare cases.</div></div>
+  <div class="insight-box i-grn"><div class="i-title">✅ Comparing box plots side by side</div><div class="i-body">Compare salary of churned vs not-churned customers. If boxes don't overlap much → salary predicts churn well. If completely overlapping → salary is useless as a feature.</div></div>
+  <div class="why" style="margin-top:12px;"><strong>Where used in ML</strong>Outlier detection before training. Comparing feature distributions across classes. Checking if classes have different distributions (feature usefulness check).</div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════ HEATMAP ══ -->
+<div class="page" id="p5">
+<div class="card">
+  <div class="title">🌡️ Heatmap — sns.heatmap()</div>
+  <div class="sub">Colour grid showing correlation between all features</div>
+  <div class="panel">
+    <div class="ptitle">Correlation matrix heatmap</div>
+    <canvas id="c5a" height="220"></canvas>
+  </div>
+  <div class="code">
+import seaborn as sns<br>
+corr = df.corr()               <span class="cmt"># compute correlations</span><br>
+sns.heatmap(corr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;annot=True,            <span class="cmt"># show numbers in cells</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;cmap='coolwarm',       <span class="cmt"># red=positive, blue=negative</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;fmt='.2f')             <span class="cmt"># 2 decimal places</span>
+  </div>
+  <div class="ptitle" style="margin-top:14px;">HOW TO READ IT</div>
+  <div class="col2">
+    <div>
+      <div class="insight-box i-red"><div class="i-title">🔴 Dark red cell = +1.0</div><div class="i-body">Perfect positive correlation. As one goes up, other goes up. Drop one — they're redundant.</div></div>
+      <div class="insight-box i-grn"><div class="i-title">🔵 Dark blue cell = −1.0</div><div class="i-body">Perfect negative correlation. As one goes up, other goes down. Also redundant — drop one.</div></div>
+    </div>
+    <div>
+      <div class="insight-box i-pur"><div class="i-title">⬜ White/light cell = ~0</div><div class="i-body">No correlation. Features are independent of each other. Both are useful — keep both.</div></div>
+      <div class="insight-box i-yel"><div class="i-title">📍 Diagonal is always 1.0</div><div class="i-body">Every feature perfectly correlates with itself. Ignore the diagonal — it's meaningless.</div></div>
+    </div>
+  </div>
+  <div class="why" style="margin-top:8px;"><strong>Where used in ML</strong>Feature selection — drop highly correlated features (>0.9). Finding which features correlate with target variable. Multicollinearity check before linear models.</div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════ TIPS ══ -->
+<div class="page" id="p6">
+<div class="card">
+  <div class="title">⚙️ Important Matplotlib Things to Remember</div>
+  <div class="sub">The things that trip up beginners</div>
+
+  <div class="ptitle">THE STANDARD TEMPLATE — use every time</div>
+  <div class="code">
+plt.figure(figsize=(10, 6))  <span class="cmt"># always set size first</span><br>
+plt.plot(...)                <span class="cmt"># draw your graph</span><br>
+plt.xlabel('X label')        <span class="cmt"># always label axes</span><br>
+plt.ylabel('Y label')<br>
+plt.title('My Title')        <span class="cmt"># always add title</span><br>
+plt.legend()                 <span class="cmt"># if multiple lines</span><br>
+plt.tight_layout()           <span class="cmt"># prevents labels getting cut off</span><br>
+plt.show()                   <span class="cmt"># display the graph</span>
+  </div>
+
+  <div class="ptitle" style="margin-top:14px;">MULTIPLE PLOTS SIDE BY SIDE</div>
+  <div class="code">
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))<span class="cmt"> # 1 row, 2 cols</span><br>
+axes[0].plot(train_loss)     <span class="cmt"># left plot</span><br>
+axes[0].set_title('Loss')<br>
+axes[1].plot(accuracy)       <span class="cmt"># right plot</span><br>
+axes[1].set_title('Accuracy')
+  </div>
+
+  <div class="ptitle" style="margin-top:14px;">COMMON THINGS PEOPLE FORGET</div>
+  <div class="col2">
+    <div class="insight-box i-red"><div class="i-title">❌ Forget plt.legend()</div><div class="i-body">You set label='Train Loss' but no legend appears. Always call plt.legend() after all plt.plot() calls.</div></div>
+    <div class="insight-box i-red"><div class="i-title">❌ Labels overlapping</div><div class="i-body">X-axis category names crash into each other. Fix: plt.xticks(rotation=45) to tilt them.</div></div>
+    <div class="insight-box i-red"><div class="i-title">❌ Title/labels cut off</div><div class="i-body">Graph looks cropped. Fix: add plt.tight_layout() before plt.show().</div></div>
+    <div class="insight-box i-red"><div class="i-title">❌ Plots stacking on each other</div><div class="i-body">Previous plot bleeds into next. Fix: call plt.figure() or plt.clf() before each new plot.</div></div>
+  </div>
+
+  <div class="ptitle" style="margin-top:14px;">USEFUL STYLING OPTIONS</div>
+  <div class="code">
+plt.plot(x, y, color='#a78bfa')   <span class="cmt"># hex colour</span><br>
+plt.plot(x, y, linewidth=2)       <span class="cmt"># thicker line</span><br>
+plt.plot(x, y, linestyle='--')    <span class="cmt"># dashed line</span><br>
+plt.plot(x, y, marker='o')        <span class="cmt"># dot at each point</span><br>
+plt.scatter(x, y, alpha=0.5)      <span class="cmt"># 50% transparent dots</span><br>
+plt.scatter(x, y, s=100)          <span class="cmt"># bigger dots (size)</span><br>
+plt.axhline(y=0.5, color='gray', linestyle='--') <span class="cmt"># horizontal reference line</span><br>
+plt.grid(True, alpha=0.3)         <span class="cmt"># light grid lines</span>
+  </div>
+
+  <div class="ptitle" style="margin-top:14px;">WHICH PLOT FOR WHICH SITUATION</div>
+  <table>
+    <tr><th>Situation</th><th>Plot</th><th>Why</th></tr>
+    <tr><td style="color:#fbbf24;">Loss over training</td><td style="color:#86efac;">plt.plot()</td><td style="color:#9ca3af;">Shows trend over time</td></tr>
+    <tr><td style="color:#fbbf24;">Class imbalance check</td><td style="color:#86efac;">plt.bar()</td><td style="color:#9ca3af;">Compare counts per class</td></tr>
+    <tr><td style="color:#fbbf24;">Feature correlation</td><td style="color:#86efac;">sns.heatmap()</td><td style="color:#9ca3af;">See all correlations at once</td></tr>
+    <tr><td style="color:#fbbf24;">Feature distribution</td><td style="color:#86efac;">plt.hist()</td><td style="color:#9ca3af;">Check skew, outliers</td></tr>
+    <tr><td style="color:#fbbf24;">Two features vs class</td><td style="color:#86efac;">plt.scatter()</td><td style="color:#9ca3af;">See if classes separable</td></tr>
+    <tr><td style="color:#fbbf24;">Outlier detection</td><td style="color:#86efac;">plt.boxplot()</td><td style="color:#9ca3af;">Dots beyond whiskers = outliers</td></tr>
+    <tr><td style="color:#fbbf24;">Actual vs predicted</td><td style="color:#86efac;">plt.scatter()</td><td style="color:#9ca3af;">Perfect model = diagonal line</td></tr>
+    <tr><td style="color:#fbbf24;">Feature importance</td><td style="color:#86efac;">plt.barh()</td><td style="color:#9ca3af;">Horizontal bars, easier to read</td></tr>
+  </table>
+</div>
+</div>
+
+</div>
+<script>
+function go(n) {
+  document.querySelectorAll('.page').forEach((p,i)=>p.classList.toggle('active',i===n));
+  document.querySelectorAll('.nav-btn').forEach((b,i)=>b.classList.toggle('active',i===n));
+  const draws=[p0,p1,p2,p3,p4,p5,()=>{}];
+  draws[n]();
+}
+function mkctx(id,h){
+  const c=document.getElementById(id);
+  c.width=Math.min(820,c.parentElement.offsetWidth-28);
+  c.height=h;
+  const ct=c.getContext('2d');
+  ct.fillStyle='#0f1117';ct.fillRect(0,0,c.width,c.height);
+  return [ct,c.width,c.height];
+}
+function grid(ct,W,H){
+  ct.strokeStyle='#1e2130';ct.lineWidth=1;
+  for(let x=0;x<=W;x+=W/6){ct.beginPath();ct.moveTo(x,0);ct.lineTo(x,H);ct.stroke();}
+  for(let y=0;y<=H;y+=H/4){ct.beginPath();ct.moveTo(0,y);ct.lineTo(W,y);ct.stroke();}
+}
+function lbl(ct,x,y,t,col,sz='11px'){ct.fillStyle=col;ct.font=sz+' Segoe UI';ct.fillText(t,x,y);}
+
+// ── p0 line ──────────────────────────────────────
+function p0(){
+  // healthy
+  let[ct,W,H]=mkctx('c0a',160); grid(ct,W,H);
+  const tr=[2.4,1.9,1.3,0.8,0.5,0.3], vl=[2.5,2.0,1.5,1.2,1.1,1.0];
+  const max=2.8,min=0;
+  function drawLine(ct,data,col,W,H,max,min){
+    ct.strokeStyle=col;ct.lineWidth=2.5;ct.beginPath();
+    data.forEach((v,i)=>{
+      const x=30+i*(W-40)/(data.length-1), y=H-15-(v-min)/(max-min)*(H-30);
+      i===0?ct.moveTo(x,y):ct.lineTo(x,y);
+    });ct.stroke();
+  }
+  drawLine(ct,tr,'#7dd3fc',W,H,max,min);
+  drawLine(ct,vl,'#fca5a5',W,H,max,min);
+  lbl(ct,10,14,'Train','#7dd3fc');lbl(ct,60,14,'Val','#fca5a5');
+  lbl(ct,10,H-2,'Both dropping ✅','#86efac','10px');
+
+  // overfitting
+  let[ct2,W2,H2]=mkctx('c0b',160); grid(ct2,W2,H2);
+  const tr2=[2.4,1.8,1.2,0.7,0.4,0.2], vl2=[2.5,2.0,1.5,1.4,1.6,1.9];
+  drawLine(ct2,tr2,'#7dd3fc',W2,H2,max,min);
+  drawLine(ct2,vl2,'#fca5a5',W2,H2,max,min);
+  lbl(ct2,10,14,'Train','#7dd3fc');lbl(ct2,60,14,'Val','#fca5a5');
+  lbl(ct2,10,H2-2,'Val rising = overfitting ❌','#fca5a5','10px');
+}
+
+// ── p1 bar ──────────────────────────────────────
+function p1(){
+  // feature importance
+  let[ct,W,H]=mkctx('c1a',160); grid(ct,W,H);
+  const feats=['age','salary','score','city','plan'], vals=[0.42,0.35,0.28,0.08,0.05];
+  const bw=(W-40)/(feats.length), pad=6;
+  const colors=['#a78bfa','#7dd3fc','#86efac','#fcd34d','#fca5a5'];
+  vals.forEach((v,i)=>{
+    const bh=(H-30)*v/0.5, x=20+i*bw+pad, y=H-15-bh;
+    ct.fillStyle=colors[i]; ct.fillRect(x,y,bw-pad*2,bh);
+    ct.fillStyle='#6b7280'; ct.font='9px Segoe UI'; ct.textAlign='center';
+    ct.fillText(feats[i],x+(bw-pad*2)/2,H-3);ct.textAlign='left';
+  });
+  lbl(ct,10,14,'Feature Importance','#9ca3af','10px');
+
+  // class imbalance
+  let[ct2,W2,H2]=mkctx('c1b',160); grid(ct2,W2,H2);
+  const classes=['Not Churned (0)','Churned (1)'], cnts=[850,150];
+  const bw2=(W2-40)/2;
+  [[0,'#7dd3fc'],[1,'#fca5a5']].forEach(([i,col])=>{
+    const bh=(H2-30)*cnts[i]/950, x=20+i*bw2+8, y=H2-15-bh;
+    ct2.fillStyle=col; ct2.fillRect(x,y,bw2-16,bh);
+    ct2.fillStyle='#9ca3af'; ct2.font='10px Segoe UI'; ct2.textAlign='center';
+    ct2.fillText(classes[i],x+(bw2-16)/2,H2-3);
+    ct2.fillText(cnts[i],x+(bw2-16)/2,y-4);ct2.textAlign='left';
+  });
+  lbl(ct2,10,14,'Class imbalance! ❌','#fca5a5','10px');
+}
+
+// ── p2 scatter ──────────────────────────────────
+function p2(){
+  function sc(ct,W,H,pts){
+    pts.forEach(({x,y,col})=>{
+      ct.beginPath();ct.arc(x,y,5,0,2*Math.PI);
+      ct.fillStyle=col;ct.globalAlpha=0.7;ct.fill();ct.globalAlpha=1;
+    });
+  }
+  // correlation
+  let[ct,W,H]=mkctx('c2a',160); grid(ct,W,H);
+  const pts1=[];
+  for(let i=0;i<40;i++){
+    const x=20+Math.random()*(W-40);
+    const y=H-15-(x-20)/(W-40)*(H-40)+((Math.random()-0.5)*30);
+    pts1.push({x,y:Math.max(15,Math.min(H-10,y)),col:'#7dd3fc'});
+  }
+  sc(ct,W,H,pts1);
+  lbl(ct,10,14,'Strong positive correlation','#9ca3af','10px');
+  lbl(ct,10,H-3,'→ consider dropping one feature','#fbbf24','10px');
+
+  // separable classes
+  let[ct2,W2,H2]=mkctx('c2b',160); grid(ct2,W2,H2);
+  const pts2=[];
+  for(let i=0;i<25;i++) pts2.push({x:20+Math.random()*(W2/2-30),y:20+Math.random()*(H2/2-20),col:'#86efac'});
+  for(let i=0;i<25;i++) pts2.push({x:W2/2+10+Math.random()*(W2/2-30),y:H2/2+10+Math.random()*(H2/2-20),col:'#fca5a5'});
+  sc(ct2,W2,H2,pts2);
+  lbl(ct2,10,14,'Classes separable ✅','#86efac','10px');
+  lbl(ct2,10,H2-3,'→ simple model might work','#fbbf24','10px');
+}
+
+// ── p3 histogram ─────────────────────────────────
+function p3(){
+  function hist(ct,W,H,data,col,title,note,notecol){
+    grid(ct,W,H);
+    const min=Math.min(...data),max=Math.max(...data),bins=12;
+    const bsize=(max-min)/bins, counts=new Array(bins).fill(0);
+    data.forEach(v=>{ const b=Math.min(bins-1,Math.floor((v-min)/bsize)); counts[b]++; });
+    const maxC=Math.max(...counts);
+    const bw=(W-30)/bins;
+    counts.forEach((c,i)=>{
+      const bh=(H-30)*c/maxC, x=15+i*bw, y=H-15-bh;
+      ct.fillStyle=col; ct.fillRect(x+1,y,bw-2,bh);
+    });
+    lbl(ct,10,14,title,'#9ca3af','10px');
+    lbl(ct,10,H-3,note,notecol,'10px');
+  }
+  // normal
+  let[ct,W,H]=mkctx('c3a',160);
+  const norm=[];for(let i=0;i<200;i++){let u=0;for(let j=0;j<6;j++)u+=Math.random();norm.push(u/6*100);}
+  hist(ct,W,H,norm,'#7dd3fc','Normal distribution','✅ Good — no transformation needed','#86efac');
+
+  // skewed
+  let[ct2,W2,H2]=mkctx('c3b',160);
+  const skew=[];for(let i=0;i<200;i++)skew.push(Math.pow(Math.random(),3)*200000);
+  hist(ct2,W2,H2,skew,'#fca5a5','Right skewed (salary-like)','⚠️ Apply log transform','#fbbf24');
+}
+
+// ── p4 boxplot ───────────────────────────────────
+function p4(){
+  let[ct,W,H]=mkctx('c4a',200);
+  const cx=W/2, q1=H*0.65, q3=H*0.25, med=H*0.48, wlo=H*0.80, whi=H*0.12;
+  const bw=80;
+  // box
+  ct.fillStyle='#1e3a5f'; ct.fillRect(cx-bw/2,q3,bw,q1-q3);
+  ct.strokeStyle='#7dd3fc'; ct.lineWidth=2;
+  ct.strokeRect(cx-bw/2,q3,bw,q1-q3);
+  // median
+  ct.strokeStyle='#fcd34d'; ct.lineWidth=3;
+  ct.beginPath();ct.moveTo(cx-bw/2,med);ct.lineTo(cx+bw/2,med);ct.stroke();
+  // whiskers
+  ct.strokeStyle='#7dd3fc'; ct.lineWidth=1.5;
+  [whi,wlo].forEach(y=>{
+    ct.beginPath();ct.moveTo(cx,y===whi?q3:q1);ct.lineTo(cx,y);ct.stroke();
+    ct.beginPath();ct.moveTo(cx-20,y);ct.lineTo(cx+20,y);ct.stroke();
+  });
+  // outliers
+  [[cx-10,H*0.05],[cx+5,H*0.92],[cx-8,H*0.95]].forEach(([x,y])=>{
+    ct.beginPath();ct.arc(x,y,5,0,2*Math.PI);
+    ct.fillStyle='#ef4444';ct.fill();
+    ct.strokeStyle='#fca5a5';ct.lineWidth=1;ct.stroke();
+  });
+  // labels
+  const lbls=[[cx+bw/2+8,q3,'Q3 (75th %ile)','#7dd3fc'],[cx+bw/2+8,q1,'Q1 (25th %ile)','#7dd3fc'],
+               [cx+bw/2+8,med,'Median','#fcd34d'],[cx+bw/2+8,whi,'Upper whisker','#6b7280'],
+               [cx+bw/2+8,wlo,'Lower whisker','#6b7280'],[cx+bw/2+8,H*0.93,'Outliers ← investigate!','#ef4444']];
+  lbls.forEach(([x,y,t,c])=>lbl(ct,x,y+4,t,c,'11px'));
+  // IQR brace
+  lbl(ct,cx-bw/2-70,(q1+q3)/2,'IQR','#a78bfa','11px');
+  lbl(ct,cx-bw/2-70,(q1+q3)/2+14,'(middle 50%)','#6b7280','10px');
+}
+
+// ── p5 heatmap ───────────────────────────────────
+function p5(){
+  let[ct,W,H]=mkctx('c5a',220);
+  const features=['age','salary','score','churn'];
+  const corr=[[1.0,0.45,0.21,-0.12],[0.45,1.0,-0.08,0.62],[0.21,-0.08,1.0,-0.55],[-0.12,0.62,-0.55,1.0]];
+  const n=features.length, cellW=(W-80)/n, cellH=(H-50)/n;
+  corr.forEach((row,i)=>{
+    row.forEach((v,j)=>{
+      const x=50+j*cellW, y=20+i*cellH;
+      const r=v>0?Math.round(139+116*v):Math.round(139+116*Math.abs(v));
+      const g=Math.round(139-139*Math.abs(v));
+      const b=v<0?Math.round(139+116*Math.abs(v)):Math.round(139+116*v);
+      // coolwarm: positive=red, negative=blue
+      let ri,gi,bi;
+      if(v>0){ri=Math.round(139+116*v);gi=Math.round(139-100*v);bi=Math.round(139-100*v);}
+      else{ri=Math.round(139-100*Math.abs(v));gi=Math.round(139-100*Math.abs(v));bi=Math.round(139+116*Math.abs(v));}
+      ct.fillStyle=`rgb(${ri},${gi},${bi})`;
+      ct.fillRect(x,y,cellW-2,cellH-2);
+      ct.fillStyle= Math.abs(v)>0.5?'#fff':'#000';
+      ct.font='11px Segoe UI'; ct.textAlign='center';
+      ct.fillText(v.toFixed(2),x+cellW/2,y+cellH/2+4);
+      ct.textAlign='left';
+    });
+    ct.fillStyle='#9ca3af'; ct.font='11px Segoe UI';
+    ct.fillText(features[i],2,20+i*cellH+cellH/2+4);
+  });
+  features.forEach((f,i)=>{
+    ct.fillStyle='#9ca3af'; ct.font='10px Segoe UI'; ct.textAlign='center';
+    ct.fillText(f,50+i*cellW+cellW/2,H-4); ct.textAlign='left';
+  });
+  lbl(ct,50,14,'🔴 Red = positive corr  🔵 Blue = negative corr  ⬜ White = no corr','#6b7280','10px');
+}
+
+setTimeout(p0,80);
+</script>
+</body>
+</html>
